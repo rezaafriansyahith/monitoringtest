@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitoring Pengunjung Perpustakaan</title>
+  <link rel="stylesheet" href="styleuser.css" />
+</head>
+<body>
+  <!-- Tombol Login kanan atas -->
+  <div class="top-right">
+    <a href="admin.html">
+      <button>🔐 Login</button>
+    </a>
+  </div>
+
+  <!-- Logo -->
+  <div class="center" style="margin-top: 20px;">
+    <img src="Logo Clean.PNG" alt="Logo ITH" class="logo-ith" />
+  </div>
+
+  <header class="center">
+    <h1>📚 Monitoring Pengunjung Perpustakaan</h1>
+    <h2>Institut Teknologi Bacharuddin Jusuf Habibie</h2>
+  </header>
+
+  <!-- Kartu Jumlah Pengunjung -->
+  <div class="card center">
+    <h2>👥 Jumlah Pengunjung Aktif</h2>
+    <p id="jumlahAktif" class="jumlah-aktif">0</p>
+    <p id="statusKuota" class="status-kuota"></p>
+  </div>
+
+  <!-- Tombol Fitur -->
+  <!-- Tombol Fitur (tanpa card putih) -->
+<div class="center" style="margin-top: 30px;">
+  <div class="button-group">
+    <a href="pengunjung-aktif-user.html"><button>📝 Daftar Pengunjung Aktif</button></a>
+  </div>
+</div>
+
+
+  <footer class="center">
+    <p>&copy; 2025 Reza Afriansyah - Sistem Monitoring Perpustakaan</p>
+  </footer>
+
+  <script>
+    const api = 'https://script.google.com/macros/s/AKfycbxhxySjMzZjVevlaDiZdEFegEllq-cEr1NqNgN0KFyY8nd6zlER6YFnZCYW_-Y_7ijw/exec?action=dashboard';
+    const maksimal = 30;
+
+    async function loadDashboard() {
+      try {
+        const res = await fetch(api);
+        const data = await res.json();
+        const jumlah = data.jumlah;
+        const persen = (jumlah / maksimal) * 100;
+
+        const ele = document.getElementById('jumlahAktif');
+        const status = document.getElementById('statusKuota');
+
+        ele.textContent = jumlah;
+
+        if (persen <= 50) ele.style.color = 'green';
+        else if (persen <= 75) ele.style.color = 'orange';
+        else ele.style.color = 'red';
+
+        status.textContent = jumlah >= maksimal
+          ? "Maaf, perpustakaan penuh. Silakan datang kembali nanti."
+          : `Sisa kuota: ${maksimal - jumlah}`;
+        status.style.color = jumlah >= maksimal ? 'red' : 'gray';
+      } catch (e) {
+        const ele = document.getElementById('jumlahAktif');
+        ele.textContent = 'Gagal memuat data.';
+        ele.style.color = 'red';
+      }
+    }
+
+    loadDashboard();
+    setInterval(loadDashboard, 5000);
+  </script>
+</body>
+</html>

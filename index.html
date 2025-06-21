@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitoring Pengunjung Perpustakaan</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .top-right {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .top-right a {
+      background-color: #ff8800;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .top-right a:hover {
+      background-color: #0077cc;
+    }
+  </style>
+</head>
+<body>
+  <!-- Tombol Logout di kanan atas -->
+  <div class="top-right">
+    <a href="user.html">🔓 Logout</a>
+  </div>
+
+  <!-- Logo ITH -->
+  <div class="center" style="margin-top: 20px;">
+    <img src="Logo Clean.PNG" alt="Logo ITH" style="max-width: 100px; display: block; margin: 0 auto 10px;" />
+  </div>
+
+  <header class="center">
+    <h1>📚 Monitoring Pengunjung Perpustakaan ITH</h1>
+  </header>
+
+  <!-- Kartu Jumlah Pengunjung Aktif -->
+  <div class="card center">
+    <h2>👥 Jumlah Pengunjung Aktif</h2>
+    <p id="jumlahAktif" class="jumlah-aktif">0</p>
+    <p id="statusKuota" class="status-kuota"></p>
+  </div>
+
+  <!-- Navigasi Fitur -->
+  <div class="card center">
+    <h2>📂 Menu Fitur</h2>
+    <div class="button-group">
+      <nav class="vertical-menu">
+        <a href="pengunjung-aktif.html"><button>📝 Daftar Pengunjung Aktif</button></a>
+        <a href="histori.html"><button>📅 Histori Pengunjung</button></a>
+        <a href="daftar.html"><button>➕ Daftar Pengunjung Baru</button></a>
+      </nav>
+    </div>
+  </div>
+
+  <footer class="center">
+    <p>&copy; 2025 Reza Afriansyah - Sistem Monitoring Perpustakaan</p>
+  </footer>
+
+  <script>
+    const api = 'https://script.google.com/macros/s/AKfycbxhxySjMzZjVevlaDiZdEFegEllq-cEr1NqNgN0KFyY8nd6zlER6YFnZCYW_-Y_7ijw/exec?action=dashboard';
+    const maksimal = 30;
+
+    async function loadDashboard() {
+      try {
+        const res = await fetch(api);
+        const data = await res.json();
+        const jumlah = data.jumlah;
+        const persen = (jumlah / maksimal) * 100;
+
+        const ele = document.getElementById('jumlahAktif');
+        const status = document.getElementById('statusKuota');
+
+        ele.textContent = jumlah;
+
+        // Warna dinamis berdasarkan persentase
+        if (persen <= 50) {
+          ele.style.color = 'green';
+        } else if (persen <= 75) {
+          ele.style.color = 'orange';
+        } else {
+          ele.style.color = 'red';
+        }
+
+        if (jumlah >= maksimal) {
+          status.textContent = "Maaf, perpustakaan penuh. Silakan datang kembali nanti.";
+          status.style.color = 'red';
+        } else {
+          status.textContent = `Sisa kuota: ${maksimal - jumlah}`;
+          status.style.color = 'gray';
+        }
+      } catch (e) {
+        const ele = document.getElementById('jumlahAktif');
+        ele.textContent = 'Gagal memuat data.';
+        ele.style.color = 'red';
+      }
+    }
+
+    // Jalankan pertama kali dan update setiap 5 detik
+    loadDashboard();
+    setInterval(loadDashboard, 5000);
+  </script>
+</body>
+</html>

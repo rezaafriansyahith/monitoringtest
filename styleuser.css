@@ -1,0 +1,142 @@
+/* Reset dasar */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+body {
+  background-image: url('ith.JPEG');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: #333;
+  padding: 20px;
+  position: relative;
+}
+
+.logo-ith {
+  max-width: 100px;
+  display: block;
+  margin: 0 auto 10px;
+}
+
+/* Header */
+h1, h2 {
+  text-align: center;
+  color: #ff8800;
+  margin-bottom: 30px;
+  text-shadow:
+    -1px -1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
+    1px 1px 0 #fff;
+}
+
+.center {
+  text-align: center;
+}
+
+footer {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 40px;
+  color: #888;
+}
+
+/* Kartu */
+.card {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 24px;
+  margin: 0 auto 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  max-width: 800px;
+  backdrop-filter: blur(4px);
+}
+
+/* Tampilan jumlah */
+.jumlah-aktif {
+  font-size: 64px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.status-kuota {
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+/* Tombol */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background-color: #ff8800;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0077cc;
+}
+
+/* Tombol Login kanan atas */
+.top-right {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.top-right button {
+  background-color: #ff8800;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.top-right button:hover {
+  background-color: #0077cc;
+}
+
+/* Responsif */
+@media (max-width: 600px) {
+  .jumlah-aktif {
+    font-size: 36px;
+  }
+
+  .card {
+    padding: 15px;
+    margin: 10px;
+  }
+
+  button {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .top-right {
+    top: 10px;
+    right: 10px;
+  }
+}

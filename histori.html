@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Histori Pengunjung Harian</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Library Cetak PDF & Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+  <h1>📅 Histori Pengunjung Harian</h1>
+
+  <div class="card">
+    <label for="tanggal">Pilih Tanggal:</label>
+    <input type="date" id="tanggal" />
+    <button onclick="muatHistori()">🔍 Tampilkan</button>
+  </div>
+
+  <div class="card">
+    <div style="overflow-x:auto;">
+      <table id="tabelHistori">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Jam Masuk</th>
+            <th>Jam Keluar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="4" style="text-align:center;">Silakan pilih tanggal.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="button-group">
+      <button onclick="cetakPDF()">📄 Cetak PDF</button>
+      <button onclick="unduhExcel()">📥 Unduh Excel</button>
+    </div>
+  </div>
+
+  <div class="center">
+    <a href="index.html">
+      <button style="margin-top: 20px;">🔙 Kembali ke Dashboard</button>
+    </a>
+  </div>
+
+  <script>
+    const api = 'https://script.google.com/macros/s/AKfycbxhxySjMzZjVevlaDiZdEFegEllq-cEr1NqNgN0KFyY8nd6zlER6YFnZCYW_-Y_7ijw/exec'; // Ganti dengan URL Web App kamu
+
+    async function muatHistori() {
+      const tanggal = document.getElementById('tanggal').value;
+      const tbody = document.querySelector('#tabelHistori tbody');
+
+      if (!tanggal) {
+        alert("Pilih tanggal terlebih dahulu.");
+        return;
+      }
+
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Memuat data...</td></tr>`;
+
+      try {
+        const res = await fetch(`${api}?action=histori&tanggal=${tanggal}`);
+        const json = await res.json();
+        const data = json.histori || [];
+        
+        if (data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Tidak ada data pada tanggal tersebut.</td></tr>`;
+          return;
+        }
+        
+        tbody.innerHTML = '';
+        data.forEach((row, i) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${i + 1}</td>
+            <td>${row.nama}</td>
+            <td>${row.masuk}</td>
+            <td>${row.keluar || '-'}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        console.error("Gagal mengambil histori:", e);
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Gagal memuat data.</td></tr>`;
+      }
+    }
+
+    function cetakPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Histori Pengunjung", 14, 16);
+      doc.autoTable({ html: '#tabelHistori', startY: 24 });
+      doc.save("histori-pengunjung.pdf");
+    }
+
+    function unduhExcel() {
+      const wb = XLSX.utils.table_to_book(document.getElementById('tabelHistori'), { sheet: "Histori" });
+      XLSX.writeFile(wb, "histori-pengunjung.xlsx");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daftar Pengunjung Aktif</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>📝 Daftar Pengunjung Aktif</h1>
+
+  <div class="card">
+    <table id="tabelAktif">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Nama</th>
+          <th>Jam Masuk</th>
+        </tr>
+      </thead>
+      <tbody id="pengunjung-aktif">
+        <!-- Data akan dimuat lewat JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="center">
+    <a href="user.html">
+      <button style="margin-top: 20px;">🔙 Kembali ke Dashboard</button>
+    </a>
+  </div>
+
+  <script>
+    const api = 'https://script.google.com/macros/s/AKfycbxhxySjMzZjVevlaDiZdEFegEllq-cEr1NqNgN0KFyY8nd6zlER6YFnZCYW_-Y_7ijw/exec';
+
+    async function muatTabelAktif() {
+      try {
+        const res = await fetch(api + '?action=dashboard');
+        const data = await res.json();
+        const pengunjung = data.pengunjungData;
+        const tbody = document.getElementById("pengunjung-aktif");
+
+        tbody.innerHTML = '';
+
+        if (!pengunjung || pengunjung.length === 0) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td colspan="3" style="text-align:center;">Tidak ada pengunjung aktif saat ini.</td>`;
+          tbody.appendChild(tr);
+          return;
+        }
+
+        pengunjung.forEach((item, i) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${i + 1}</td>
+            <td>${item.nama}</td>
+            <td>${item.masuk}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        console.error("Gagal mengambil data:", e);
+        const tbody = document.getElementById("pengunjung-aktif");
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red;">Gagal memuat data.</td></tr>`;
+      }
+    }
+
+    muatTabelAktif();
+    setInterval(muatTabelAktif, 5000);
+  </script>
+</body>
+</html>
