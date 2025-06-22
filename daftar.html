@@ -2,15 +2,31 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Form Pendaftaran Pengunjung</title>
+  <title>📝 Form Pendaftaran Pengunjung</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    #ambilRfidBtn {
+      margin-top: 8px;
+      margin-bottom: 16px;
+      padding: 8px 16px;
+    }
+    #status {
+      margin-bottom: 12px;
+      color: green;
+    }
+  </style>
 </head>
 <body>
   <h1>📝 Form Pendaftaran Pengunjung</h1>
   <div class="card">
     <form id="formDaftar">
       <label>ID RFID:</label>
-      <input type="text" name="rfid" required placeholder="Tempelkan Kartu RFID" />
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="rfid" readonly placeholder="Klik tombol untuk ambil UID" />
+        <button type="button" id="ambilRfidBtn">Tempelkan Kartu (10s)</button>
+      </div>
+
+      <div id="status"></div>
 
       <label>Nama:</label>
       <input type="text" name="nama" required />
@@ -40,15 +56,66 @@
   </div>
 
   <script>
+    const rfidInput = document.getElementById('rfid');
+    const ambilRfidBtn = document.getElementById('ambilRfidBtn');
+    const statusText = document.getElementById('status');
+
+    function countdownAndFetchUID() {
+      let counter = 10;
+      ambilRfidBtn.disabled = true;
+      statusText.textContent = "";
+      ambilRfidBtn.textContent = `⏳ Tunggu ${counter}s`;
+
+      const interval = setInterval(() => {
+        counter--;
+        ambilRfidBtn.textContent = `⏳ Tunggu ${counter}s`;
+
+        if (counter <= 0) {
+          clearInterval(interval);
+          ambilRfidBtn.textContent = "✅ Mengambil UID...";
+          fetchUID();
+        }
+      }, 1000);
+    }
+
+    async function fetchUID() {
+      try {
+        const res = await fetch('https://script.google.com/macros/s/AKfycbxhxySjMzZjVevlaDiZdEFegEllq-cEr1NqNgN0KFyY8nd6zlER6YFnZCYW_-Y_7ijw/exec?action=uid_terbaru');
+        const uid = await res.text();
+
+        if (uid && uid.length > 0 && !uid.includes("tidak")) {
+          rfidInput.value = uid;
+          statusText.textContent = "✅ UID berhasil dibaca, silakan isi data.";
+        } else {
+          rfidInput.placeholder = "UID belum tersedia";
+          statusText.textContent = "❌ UID belum tersedia.";
+        }
+      } catch (err) {
+        rfidInput.placeholder = "Gagal mengambil UID";
+        statusText.textContent = "❌ Gagal mengambil UID.";
+      } finally {
+        ambilRfidBtn.disabled = false;
+        ambilRfidBtn.textContent = "Tempelkan Kartu (10s)";
+      }
+    }
+
+    ambilRfidBtn.addEventListener('click', countdownAndFetchUID);
+
+    // Form submit
     const form = document.getElementById('formDaftar');
-    form.addEventListener('submit', async function(e) {
+    form.addEventListener('submit', async function (e) {
       e.preventDefault();
 
       const data = new FormData(form);
-      const payload = new URLSearchParams(data);
+      const payload = new URLSearchParams();
+      payload.append('action', 'daftar');
+      payload.append('nama', data.get('nama'));
+      payload.append('id', data.get('id'));
+      payload.append('jabatan', data.get('jabatan'));
+      payload.append('hp', data.get('hp'));
 
       try {
-        const res = await fetch('https://script.google.com/macros/s/AKfycbxhxySjMzZjVevlaDiZdEFegEllq-cEr1NqNgN0KFyY8nd6zlER6YFnZCYW_-Y_7ijw/exec?action=daftar', {
+        const res = await fetch('https://script.google.com/macros/s/AKfycbxhxySjMzZjVevlaDiZdEFegEllq-cEr1NqNgN0KFyY8nd6zlER6YFnZCYW_-Y_7ijw/exec', {
           method: 'POST',
           body: payload,
         });
@@ -56,6 +123,8 @@
         const result = await res.text();
         alert(result);
         form.reset();
+        rfidInput.value = "";
+        statusText.textContent = "";
       } catch (err) {
         alert("Gagal mengirim data.");
       }
